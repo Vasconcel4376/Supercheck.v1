@@ -1,0 +1,167 @@
+// Esquema de base de datos para Sistema de Gestión de Supermercado
+// Utiliza Prisma ORM con MySQL
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["filterJson"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum RolUsuario {
+  ADMINISTRADOR
+  GERENTE
+  CAJERO
+  PROVEEDOR
+}
+
+model Usuario {
+  id                Int             @id @default(autoincrement())
+  nombre            String          @db.VarChar(100)
+  correo            String          @unique @db.VarChar(255)
+  contraseña        String          @db.VarChar(255)
+  rol               RolUsuario      @default(CAJERO)
+  activo            Boolean         @default(true)
+  fechaCreacion     DateTime        @default(now())
+  fechaActualizacion DateTime       @updatedAt
+  cierresCaja       CierreCaja[]
+  ventas            Venta[]
+  registrosAuditoria RegistroAuditoria[]
+
+  @@index([correo, rol])
+}
+
+model Proveedor {
+  id                Int             @id @default(autoincrement())
+  nombre            String          @db.VarChar(100)
+  contactoPrincipal String          @db.VarChar(100)
+  telefono          String          @db.VarChar(20)
+  correo            String          @db.VarChar(100)
+  direccion         String?
+  calificacion      Float           @default(0.0)
+  sitioWeb          String?
+  ingresosStock     IngresoStock[]
+  productos         Producto[]
+  fechaCreacion     DateTime        @default(now())
+  fechaActualizacion DateTime       @updatedAt
+
+  @@index([nombre, calificacion])
+}
+
+model Marca {
+  id                Int             @id @default(autoincrement())
+  nombre            String          @unique @db.VarChar(50)
+  descripcion       String?
+  logoUrl           String?
+  productos         Producto[]
+  fechaCreacion     DateTime        @default(now())
+  fechaActualizacion DateTime       @updatedAt
+}
+
+model Producto {
+  id                Int             @id @default(autoincrement())
+  nombre            String          @db.VarChar(100)
+  sku               String          @unique @db.VarChar(50)
+  descripcion       String?
+  marca             Marca           @relation(fields: [marcaId], references: [id])
+  marcaId           Int
+  precio            Decimal         @db.Decimal(10, 2)
+  costo             Decimal         @db.Decimal(10, 2)
+  stock             Int             @default(0)
+  stockMinimo       Int             @default(10)
+  codigoBarras      String?         @db.VarChar(50)
+  fechaExpiracion   DateTime?
+  proveedor         Proveedor?      @relation(fields: [proveedorId], references: [id])
+  proveedorId       Int?
+  ingresosStock     IngresoStock[]
+  detallesVenta     DetalleVenta[]
+  fechaCreacion     DateTime        @default(now())
+  fechaActualizacion DateTime       @updatedAt
+
+  @@index([nombre, sku, codigoBarras])
+}
+
+model Venta {
+  id                Int             @id @default(autoincrement())
+  subtotal          Decimal         @db.Decimal(12, 2)
+  total             Decimal         @db.Decimal(12, 2)
+  metodoPago        String          @default("EFECTIVO")
+  detallesPago      Json?
+  usuario           Usuario         @relation(fields: [usuarioId], references: [id])
+  usuarioId         Int
+  detalles          DetalleVenta[]
+  cierreCaja        CierreCaja?     @relation(fields: [cierreCajaId], references: [id])
+  cierreCajaId      Int?
+  fechaCreacion     DateTime        @default(now())
+  fechaActualizacion DateTime       @updatedAt
+
+  @@index([usuarioId, cierreCajaId])
+}
+
+
+model DetalleVenta {
+  id                Int             @id @default(autoincrement())
+  venta             Venta           @relation(fields: [ventaId], references: [id])
+  ventaId           Int
+  producto          Producto        @relation(fields: [productoId], references: [id])
+  productoId        Int
+  cantidad          Int
+  precioUnitario    Decimal         @db.Decimal(10, 2)
+  descuento         Decimal         @db.Decimal(5, 2) @default(0.0)
+  fechaCreacion     DateTime        @default(now())
+
+  @@index([ventaId, productoId])
+}
+
+model CierreCaja {
+  id              Int       @id @default(autoincrement())
+  fechaApertura   DateTime  @default(now())
+  fechaCierre     DateTime?
+  montoInicial    Decimal   @db.Decimal(12, 2)
+  montoFinal      Decimal   @db.Decimal(12, 2) @default(0)
+  diferencia      Decimal   @db.Decimal(12, 2) @default(0)
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId       Int
+  ventas          Venta[]
+  observaciones   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([usuarioId, fechaApertura])
+}
+
+model IngresoStock {
+  id                Int             @id @default(autoincrement())
+  proveedor         Proveedor       @relation(fields: [proveedorId], references: [id])
+  proveedorId       Int
+  producto          Producto        @relation(fields: [productoId], references: [id])
+  productoId        Int
+  cantidad          Int
+  costoUnitario     Decimal         @db.Decimal(10, 2)
+  costoTotal        Decimal         @db.Decimal(12, 2)
+  fechaIngreso      DateTime        @default(now())
+  fechaExpiracion   DateTime?
+  numeroFactura     String?         @db.VarChar(50)
+  fechaCreacion     DateTime        @default(now())
+  fechaActualizacion DateTime       @updatedAt
+
+  @@index([proveedorId, productoId])
+}
+
+model RegistroAuditoria {
+  id                Int             @id @default(autoincrement())
+  tipoAccion        String
+  entidad           String
+  entidadId         Int?
+  usuario           Usuario         @relation(fields: [usuarioId], references: [id])
+  usuarioId         Int
+  detalles          Json?
+  direccionIP       String?
+  agenteUsuario     String?
+  fechaCreacion     DateTime        @default(now())
+
+  @@index([tipoAccion, entidad])
+}
