@@ -1,7 +1,8 @@
-// src/components/auth/LoginForm.tsx
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '../../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 
 export default function LoginForm() {
@@ -14,7 +15,9 @@ export default function LoginForm() {
 
   // Redirigir si ya está autenticado
   useEffect(() => {
-    if (user) router.push('/dashboard');
+    if (user) {
+      router.push('/dashboard');
+    }
   }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {

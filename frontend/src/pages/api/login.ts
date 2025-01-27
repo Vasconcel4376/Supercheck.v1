@@ -17,7 +17,6 @@ export default async function handler(
   const { email, password } = req.body;
 
   try {
-    // 1. Buscar usuario
     const user = await prisma.usuario.findUnique({
       where: { correo: email },
     });
@@ -26,12 +25,10 @@ export default async function handler(
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    // 2. Generar JWT
     const token = jwt.sign({ userId: user.id, rol: user.rol }, JWT_SECRET, {
       expiresIn: '8h',
     });
 
-    // 3. Enviar respuesta
     res.setHeader(
       'Set-Cookie',
       `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${8 * 3600}`

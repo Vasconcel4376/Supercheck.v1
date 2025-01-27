@@ -1,6 +1,5 @@
-// src/features/productos/ProductTable.tsx
 import { useState } from 'react';
-import { Producto, Marca, Proveedor } from '../../types';
+import { Producto, Marca, Proveedor } from '@/types';
 import ProductModal from './ProductModal';
 
 interface ProductTableProps {
@@ -65,7 +64,7 @@ export default function ProductTable({
                   {producto.nombre}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {producto.marca.nombre}
+                  {producto.marca?.nombre || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   ${producto.precio.toFixed(2)}

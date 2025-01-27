@@ -1,5 +1,4 @@
-// src/features/proveedores/SupplierManager.tsx
-import { Proveedor } from '../../types';
+import { Proveedor } from '@/types';
 
 interface SupplierManagerProps {
   proveedores: Proveedor[];

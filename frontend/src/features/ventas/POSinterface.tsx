@@ -1,37 +1,47 @@
-// src/features/ventas/POSInterface.tsx
-import { useState } from 'react'
-import { Producto, DetalleVenta, MetodoPago } from '../../types'
+import { useState } from 'react';
+import { Producto, DetalleVenta, MetodoPago } from '@/types';
 
 interface POSInterfaceProps {
-  productos: Producto[]
+  productos: Producto[];
 }
 
 export default function POSInterface({ productos }: POSInterfaceProps) {
-  const [cart, setCart] = useState<DetalleVenta[]>([])
-  const [metodoPago, setMetodoPago] = useState<MetodoPago>('EFECTIVO')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [cart, setCart] = useState<DetalleVenta[]>([]);
+  const [metodoPago, setMetodoPago] = useState<MetodoPago>('EFECTIVO');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const addToCart = (producto: Producto) => {
-    const existing = cart.find(item => item.producto.id === producto.id)
+    const existing = cart.find((item) => item.producto.id === producto.id);
     if (existing) {
-      setCart(cart.map(item =>
-        item.producto.id === producto.id
-          ? { ...item, cantidad: item.cantidad + 1 }
-          : item
-      ))
+      setCart(
+        cart.map((item) =>
+          item.producto.id === producto.id
+            ? { ...item, cantidad: item.cantidad + 1 }
+            : item
+        )
+      );
     } else {
-      setCart([...cart, {
-        producto,
-        cantidad: 1,
-        precioUnitario: producto.precio,
-        descuento: 0
-      }])
+      setCart([
+        ...cart,
+        {
+          id: 0, // Podrías manejar un ID fake local
+          ventaId: 0,
+          producto,
+          productoId: producto.id,
+          cantidad: 1,
+          precioUnitario: producto.precio,
+          descuento: 0,
+          fechaCreacion: new Date(),
+        },
+      ]);
     }
-  }
+  };
 
-  const total = cart.reduce((sum, item) => 
-    sum + (item.cantidad * item.precioUnitario * (1 - item.descuento / 100)), 0
-  )
+  const total = cart.reduce(
+    (sum, item) =>
+      sum + item.cantidad * item.precioUnitario * (1 - item.descuento / 100),
+    0
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -47,15 +57,19 @@ export default function POSInterface({ productos }: POSInterfaceProps) {
         />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {productos
-            .filter(p => p.nombre.toLowerCase().includes(searchTerm.toLowerCase()))
-            .map(producto => (
+            .filter((p) =>
+              p.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((producto) => (
               <button
                 key={producto.id}
                 onClick={() => addToCart(producto)}
                 className="border p-4 rounded hover:bg-gray-50 text-left"
               >
                 <h4 className="font-medium">{producto.nombre}</h4>
-                <p className="text-sm text-gray-600">${producto.precio.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">
+                  ${producto.precio.toFixed(2)}
+                </p>
                 <p className="text-sm text-gray-600">Stock: {producto.stock}</p>
               </button>
             ))}
@@ -67,7 +81,10 @@ export default function POSInterface({ productos }: POSInterfaceProps) {
         <h3 className="text-xl font-semibold mb-4">Carrito de Compra</h3>
         <div className="space-y-4">
           {cart.map((item, index) => (
-            <div key={index} className="flex justify-between items-center border-b pb-2">
+            <div
+              key={index}
+              className="flex justify-between items-center border-b pb-2"
+            >
               <div className="flex-1">
                 <h4 className="font-medium">{item.producto.nombre}</h4>
                 <div className="flex items-center space-x-2">
@@ -75,10 +92,14 @@ export default function POSInterface({ productos }: POSInterfaceProps) {
                     type="number"
                     value={item.cantidad}
                     onChange={(e) => {
-                      const newQty = Math.max(1, parseInt(e.target.value))
-                      setCart(cart.map((cartItem, i) => 
-                        i === index ? { ...cartItem, cantidad: newQty } : cartItem
-                      ))
+                      const newQty = Math.max(1, parseInt(e.target.value));
+                      setCart(
+                        cart.map((cartItem, i) =>
+                          i === index
+                            ? { ...cartItem, cantidad: newQty }
+                            : cartItem
+                        )
+                      );
                     }}
                     className="w-16 p-1 border rounded"
                   />
@@ -100,7 +121,7 @@ export default function POSInterface({ productos }: POSInterfaceProps) {
             <span>Total:</span>
             <span>${total.toFixed(2)}</span>
           </div>
-          
+
           <select
             value={metodoPago}
             onChange={(e) => setMetodoPago(e.target.value as MetodoPago)}
@@ -109,16 +130,19 @@ export default function POSInterface({ productos }: POSInterfaceProps) {
             <option value="EFECTIVO">Efectivo</option>
             <option value="TARJETA">Tarjeta</option>
             <option value="TRANSFERENCIA">Transferencia</option>
+            <option value="OTRO">Otro</option>
           </select>
 
           <button
             className="w-full bg-success text-white py-3 rounded hover:bg-green-600"
-            onClick={() => {/* Lógica de venta */}
+            onClick={() => {
+              // Lógica de venta
+            }}
           >
             Finalizar Venta
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

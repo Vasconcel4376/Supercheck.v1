@@ -1,8 +1,8 @@
 // src/app/layout.tsx (Next.js 13+ App Router)
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { AuthProvider } from '../context/AuthContext';
-import '../styles/globals.css';
+import { AuthProvider } from '@/context/AuthContext';
+import '@/styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.className} bg-gray-50`}>
+        {/* Proveedor global de autenticación */}
         <AuthProvider>
           <main className="min-h-screen">{children}</main>
         </AuthProvider>

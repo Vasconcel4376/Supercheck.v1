@@ -1,5 +1,4 @@
-// src/features/inventario/InventoryManager.tsx
-import { Producto } from '../../types';
+import { Producto } from '@/types';
 
 interface InventoryManagerProps {
   productos: Producto[];
@@ -36,7 +35,9 @@ export default function InventoryManager({ productos }: InventoryManagerProps) {
               <div>
                 <span className="text-gray-500">Última Actualización:</span>
                 <p>
-                  {new Date(producto.fechaActualizacion).toLocaleDateString()}
+                  {producto.fechaActualizacion
+                    ? new Date(producto.fechaActualizacion).toLocaleDateString()
+                    : 'N/A'}
                 </p>
               </div>
             </div>

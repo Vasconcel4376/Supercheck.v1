@@ -1,5 +1,5 @@
-// src/features/caja/CashControl.tsx
-import { CierreCaja } from '../../types';
+import { useState } from 'react';
+import { CierreCaja } from '@/types';
 
 interface CashControlProps {
   cierreActual?: CierreCaja;

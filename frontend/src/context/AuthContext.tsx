@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Usuario, RolUsuario } from '../types';
+import { Usuario } from '@/types';
 
 interface AuthContextType {
   user: Usuario | null;
@@ -21,9 +21,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/usuarios'); // Corrige la ruta si es necesario
-        const data = await response.json();
+        // GET /api/auth/usuarios → si hay sesión, retorna user
+        const response = await fetch('/api/auth/usuarios');
         if (response.ok) {
+          const data = await response.json();
           setUser(data.user);
         }
       } catch (error) {
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
+      // POST /api/auth/usuarios → login
       const response = await fetch('/api/auth/usuarios', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,8 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
 
-      if (!response.ok)
+      if (!response.ok) {
         throw new Error(data.message || 'Error de autenticación');
+      }
 
       setUser(data.user);
       router.push('/dashboard');
@@ -58,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    // POST /api/auth/logout → borra la cookie
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
     router.push('/login');

@@ -13,8 +13,8 @@ export type Usuario = {
   contraseña: string;
   rol: RolUsuario;
   activo: boolean;
-  fechaCreacion: Date;
-  fechaActualizacion: Date;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
 };
 
 export type Proveedor = {
@@ -26,8 +26,8 @@ export type Proveedor = {
   direccion?: string;
   calificacion: number;
   sitioWeb?: string;
-  fechaCreacion: Date;
-  fechaActualizacion: Date;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
 };
 
 export type Marca = {
@@ -35,8 +35,8 @@ export type Marca = {
   nombre: string;
   descripcion?: string;
   logoUrl?: string;
-  fechaCreacion: Date;
-  fechaActualizacion: Date;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
 };
 
 export type Producto = {
@@ -45,7 +45,7 @@ export type Producto = {
   sku: string;
   descripcion?: string;
   marcaId: number;
-  marca: Marca;
+  marca?: Marca;
   precio: number;
   costo: number;
   stock: number;
@@ -54,8 +54,8 @@ export type Producto = {
   fechaExpiracion?: Date;
   proveedorId?: number;
   proveedor?: Proveedor;
-  fechaCreacion: Date;
-  fechaActualizacion: Date;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
 };
 
 export type MetodoPago = 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'OTRO';
@@ -65,7 +65,7 @@ export type Venta = {
   subtotal: number;
   total: number;
   metodoPago: MetodoPago;
-  detallesPago: any; // Usar tipo específico si se conoce la estructura JSON
+  detallesPago: any;
   usuarioId: number;
   usuario: Usuario;
   cierreCajaId?: number;
@@ -96,9 +96,9 @@ export type CierreCaja = {
   usuarioId: number;
   usuario: Usuario;
   observaciones?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  ventas: Venta[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  ventas?: Venta[];
 };
 
 export type IngresoStock = {
@@ -148,7 +148,6 @@ export type VentaFormValues = {
   }>;
 };
 
-// Tipos para requests/responses API
 export type ApiResponse<T> = {
   data?: T;
   error?: string;
